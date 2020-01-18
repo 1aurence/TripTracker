@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using TripTracker.BackService.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace TripTracker.BackService
 {
@@ -26,12 +28,14 @@ namespace TripTracker.BackService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<Models.Repository>();
+            //services.AddTransient<Models.Repository>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddDbContext<TripContext>(options => options.UseSqlite("Data Source=JeffsTrips.db"));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Trip Tracker", Version = "v1" });
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +64,8 @@ namespace TripTracker.BackService
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            TripContext.SeedData(app.ApplicationServices);
+
         }
     }
 }
